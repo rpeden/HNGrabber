@@ -25,6 +25,7 @@ let parsePage (htmlString: string) =
     document.DocumentNode
 
 let extractMetadata (metadata: HtmlNode) = 
+    (* Extract digits from beginning of string and convert to an integer *)
     let extractNumber (strWithNum: string) = 
         try
             strWithNum |> Seq.takeWhile System.Char.IsDigit
