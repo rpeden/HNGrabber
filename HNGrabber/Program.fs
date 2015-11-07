@@ -27,7 +27,7 @@ let parsePage (htmlString: string) =
 let extractMetadata (metadata: HtmlNode) = 
     let extractNumber (strWithNum: string) = 
         try
-            strWithNum |> Seq.filter System.Char.IsDigit
+            strWithNum |> Seq.takeWhile System.Char.IsDigit
                        |> System.String.Concat
                        |> int
         with
