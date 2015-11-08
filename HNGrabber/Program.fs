@@ -19,11 +19,15 @@ let downloadFrontPage =
     use client = new WebClient()
     client.DownloadString "https://news.ycombinator.com"
 
+(* parse the string containing the HN front page into 
+ * a document we can then extract the stories out of *)
 let parsePage (htmlString: string) =
     let document = HtmlDocument()
     document.LoadHtml htmlString
     document.DocumentNode
 
+(* extract metadata (point, comment count, username of submitter, and 
+ * link to comment page) for a single HN story *)
 let extractMetadata (metadata: HtmlNode) = 
     (* Extract digits from beginning of string and convert to an integer *)
     let extractNumber (strWithNum: string) = 
@@ -42,11 +46,10 @@ let extractMetadata (metadata: HtmlNode) =
 
     HNStoryMetadata(points,commentCount,user,commentLink)
 
+(* Extract all stories from the HN front page *)
 let extractStories (document: HtmlNode) =
-
+    (* Given a story node, build a HNStory instance *)
     let buildStory (storyNode: HtmlNode) = 
-        (* handle the case where the element isn't formed the way
-           we expect it to be *)
         try
             let story = storyNode.QuerySelector(".title a")
             let metadata = extractMetadata storyNode.NextSibling;
@@ -54,6 +57,8 @@ let extractStories (document: HtmlNode) =
             let title = story.InnerText
             Some( HNStory(title, address, metadata) )
         with
+            (* Handle the exception that occurs if one of the elements we're expecting to find 
+             * is missing. *)
             | :? System.NullReferenceException -> None
 
     document.QuerySelectorAll(".athing")
@@ -61,6 +66,7 @@ let extractStories (document: HtmlNode) =
           |> Seq.choose buildStory
           |> Seq.cache
 
+(* Convert the sequence of HN stories to a JSON array with camel cased property names. *)
 let convertToJson (stories: seq<HNStory>) =
     let settings = JsonSerializerSettings( ContractResolver = CamelCasePropertyNamesContractResolver() )
     JsonConvert.SerializeObject(stories, Formatting.Indented, settings)
