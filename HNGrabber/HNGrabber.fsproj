@@ -43,8 +43,11 @@
   <Import Project="$(FSharpTargetsPath)" Condition="Exists('$(FSharpTargetsPath)')" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Program.fs" />
     <None Include="packages.config" />
+    <Compile Include="StoryTypes.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="Reddit.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Fizzler">
