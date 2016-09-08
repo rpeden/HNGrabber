@@ -7,6 +7,9 @@ type StoryMetadata(points: int, commentCount: int, user: string, commentLink: st
     member x.User = user
 
 type Story(title: string, address: string, metadata: StoryMetadata) =
-    member x.Title = title
-    member x.Address = address
+    member val Address = address with get, set
+    member x.Title = title   
     member x.Metadata = metadata
+
+type IStoryGrabber = 
+    abstract member GetStories : unit -> seq<Story>

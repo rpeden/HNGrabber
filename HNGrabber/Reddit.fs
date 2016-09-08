@@ -21,6 +21,7 @@ let extractStoryMetadata (story: HtmlNode): StoryMetadata =
 
     StoryMetadata(points, commentCount, submitter, commentLink) 
 
+
 let extractStory (story: HtmlNode): Story = 
     let metadata = extractStoryMetadata story
     let titleAnchor = story.QuerySelector(".title").QuerySelector(".title")
@@ -34,12 +35,25 @@ let extractRedditStories (document: HtmlNode): seq<Story> =
                   |> Seq.map extractStory
     stories
 
-let getRedditStories() = 
-    let redditPage = parsePage (downloadRedditPage "programming")
-
-    let stories =  downloadRedditPage "programming"
+let correctLinks: Story -> Story = fun story ->
+    if not (story.Address.StartsWith "http") then
+        story.Address <- "https://www.reddit.com" + story.Address
+    story
+        
+let getRedditStories(subReddit: string, minimumScore: int) = 
+    let stories =  downloadRedditPage subReddit
                 |> parsePage
                 |> extractRedditStories
-                |> Seq.where(fun story -> story.Metadata.Points > 50)
-                |> convertToJson
+                |> Seq.map correctLinks
+                |> Seq.where (fun story -> story.Metadata.Points >= minimumScore)
     stories
+
+type RedditStoryGrabber(minimumScore: int, ?subReddit: string) =
+    
+
+    member this.GetStories() = (this :> IStoryGrabber).GetStories()
+
+    interface IStoryGrabber with
+        member this.GetStories() = 
+            let subRedditToUse = defaultArg subReddit "programming"
+            getRedditStories(subRedditToUse,minimumScore)

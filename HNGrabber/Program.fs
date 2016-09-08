@@ -47,17 +47,26 @@ open Reddit
 
 [<EntryPoint>]
 let main argv =
-    let stories =  downloadHNFrontPage
+    (*let stories =  downloadHNFrontPage
                 |> parsePage
                 |> extractStories
-                |> Seq.where(fun story -> story.Metadata.Points > 50)
-                |> convertToJson
+                |> Seq.where(fun story -> story.Metadata.Points > 100)
+                |> convertToJson*)
 
-    
+    //let redditStories =  getRedditStories("programming")
+    //                  |> convertToJson
 
-    let redditStories = getRedditStories()
+    let redditGrabber = RedditStoryGrabber(50)
+    let webdevGrabber = RedditStoryGrabber(5,"webdev")
+    let dotnetGrabber = RedditStoryGrabber(10,"dotnet")
+
+    //let progStories = redditGrabber.GetStories() |> convertToJson
+    let webdevStories = webdevGrabber.GetStories() |> convertToJson
+    //let dotnetStories = dotnetGrabber.GetStories() |> convertToJson
 
     //printfn "%s" stories
-    printfn "%s" redditStories
+    //printfn "%s" progStories
+    //printfn "%s" stories
+    printfn "%s" webdevStories
     let x = System.Console.ReadLine() 
     0 // return an integer exit code
